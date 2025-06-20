@@ -135,17 +135,25 @@ export default function UserRoutes(app) {
   };
 
   const profile = async (req, res) => {
-    const currentUser = req.session["currentUser"];
-    // Debug: Log session information
-    console.log("Profile request - Session ID:", req.sessionID);
-    console.log("Profile request - Current user:", currentUser);
-    console.log("Profile request - Session data:", req.session);
+    try {
+      // Debug: Log session information
+      console.log("Profile request - Session ID:", req.sessionID);
+      console.log("Profile request - Session data:", req.session);
 
-    if (!currentUser) {
-      res.sendStatus(401);
-      return;
+      const currentUser = req.session["currentUser"];
+
+      if (!currentUser) {
+        console.warn("Profile request - No current user in session");
+        res.sendStatus(401);
+        return;
+      }
+
+      console.log("Profile request - Current user:", currentUser);
+      res.json(currentUser);
+    } catch (e) {
+      console.error("Error processing profile request:", e);
+      res.status(500).json({ message: e.message || "Internal Server Error" });
     }
-    res.json(currentUser);
   };
 
   const findCoursesForEnrolledUser = (req, res) => {

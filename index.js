@@ -61,6 +61,13 @@ console.log("Session options:", sessionOptions);
 // Configure session before express.json
 app.use(session(sessionOptions));
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  // Log method, URL, and timestamp
+  console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Configure express.json before all routes
 app.use(express.json());
 
@@ -71,5 +78,12 @@ EnrollmentRoutes(app);
 AssignmentRoutes(app);
 ModuleRoutes(app);
 Lab5(app);
+
+// Global error-handling middleware (should be registered after all routes)
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  // Avoid leaking stack traces in production
+  res.status(err.status || 500).json({ message: err.message || "Internal Server Error" });
+});
 
 app.listen(4000); // Use fixed port 4000
