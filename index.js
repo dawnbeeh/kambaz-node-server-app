@@ -8,6 +8,7 @@ import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import cors from "cors";
 import session from "express-session";
 import ModuleRoutes from "./Kambaz/Modules/routes.js";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -70,6 +71,27 @@ app.use((req, res, next) => {
 
 // Configure express.json before all routes
 app.use(express.json());
+
+// -----------------------------
+//  MongoDB / Mongoose Setup
+// -----------------------------
+const DEFAULT_CONNECTION_STRING =
+  "mongodb://127.0.0.1:27017/kambaz";
+
+// Render or other platforms often expose connection string in these env vars
+const CONNECTION_STRING =
+  process.env.MONGO_CONNECTION_STRING ||
+  DEFAULT_CONNECTION_STRING;
+
+console.log("Connecting to MongoDB:", CONNECTION_STRING);
+
+mongoose
+  .connect(CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅  MongoDB connection established"))
+  .catch((e) => console.error("❌  MongoDB connection error:", e));
 
 // Define routes
 UserRoutes(app);

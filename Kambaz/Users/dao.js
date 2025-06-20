@@ -1,4 +1,7 @@
 import model from "./model.js";
+import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
+
 export const createUser = (user) => {
   const newUser = { ...user, _id: uuidv4() };
   return model.create(newUser);
@@ -16,3 +19,12 @@ export const findUsersByPartialName = (partialName) => {
     $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
   });
 };
+
+const CONNECTION_STRING =
+  process.env.MONGO_CONNECTION_STRING ||       // Render / Atlas
+  "mongodb://127.0.0.1:27017/kambaz";   // fallback(local)
+
+mongoose.connect(CONNECTION_STRING,
+  { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(()=>console.log("✅ MongoDB connection established"))
+  .catch(e => console.error("❌ MongoDB connection error:", e));
